@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three.js GLTF Model Viewer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+<script>
+    // Scene, Camera, Renderer Setup
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Lighting
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(10, 10, 10);
+    scene.add(light);
+
+    // Load GLTF Model
+    const loader = new THREE.GLTFLoader();
+    loader.load('untitled.glb', (gltf) => {
+        const model = gltf.scene;
+        scene.add(model);
+
+        // Add interaction: rotate model on click
+        window.addEventListener('click', () => {
+            model.rotation.y += 0.1;
+        });
+    }, undefined, (error) => {
+        console.error(error);
+    });
+
+    // Camera Controls
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    camera.position.z = 5;
+
+    // Animation Loop
+    function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+        controls.update();
+    }
+    animate();
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+    });
+</script>
+</body>
+</html>
