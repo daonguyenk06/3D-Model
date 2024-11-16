@@ -17,10 +17,20 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    // Lighting
-    const light = new THREE.DirectionalLight(0xffffff, 1);
-    light.position.set(10, 10, 10);
-    scene.add(light);
+    /**** Lighting ****/
+    // Add ambient light for overall brightness
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambientLight);
+
+    // Add directional light for shadows and highlights
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    directionalLight.position.set(50, 50, 50);
+    scene.add(directionalLight);
+
+    // Add point lights to fill in other areas
+    const pointLight = new THREE.PointLight(0xffffff, 0.5);
+    pointLight.position.set(-50, -50, -50);
+    scene.add(pointLight);
 
     // Load GLTF Model
     const loader = new THREE.GLTFLoader();
