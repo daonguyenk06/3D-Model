@@ -2,14 +2,14 @@ import * as THREE from "https://cdn.skypack.dev/three@0.129.0/build/three.module
 
 // To allow for the camera to move around the scene
 import { OrbitControls } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js";
-// To allow for importing the .gltf file
+// To allow for importing gltf and glb files
 import { GLTFLoader } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/loaders/GLTFLoader.js";
 
 //3D environment variables
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
 const renderer = new THREE.WebGLRenderer({ alpha: true}); //Alpha: true allows for the transparent background
-const loader = new GLTFLoader(); //Works for both gltf and glb files
+const loader = new GLTFLoader();
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
@@ -69,6 +69,8 @@ const objectParts_const = {
     }
 };
 
+//TODO: Experiment with the 'controls' variable below
+
 
 //This lines by itself allows clicking, dragging, zoom in/out, and pan the scene
 let controls = new OrbitControls(camera, renderer.domElement);
@@ -118,7 +120,7 @@ loader.load(
 console.log(objectParts)
 
 //Scene
-renderer.setSize(window.innerWidth, window.innerHeight); //Current: same size as screen
+renderer.setSize(window.innerWidth, window.innerHeight);
 container3D.appendChild(renderer.domElement); //Add renderer to DOM
 
 //Camera
