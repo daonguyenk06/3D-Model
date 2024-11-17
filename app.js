@@ -153,9 +153,9 @@ function animate() {
 
     if (model) {
         // Automate movements (z: horizontally, y: clockwise, x: vertically)
-        model.rotation.z += 0.001;
-        model.rotation.y += 0.001;
-        model.rotation.x += 0.001;
+        model.rotation.z += 0.002;
+        //model.rotation.y += 0.002;
+        //model.rotation.x += 0.002;
     }
     
     renderer.render(scene, camera);
