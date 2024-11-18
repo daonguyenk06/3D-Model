@@ -77,6 +77,17 @@ const objectParts_const = {
 //This lines by itself allows clicking, dragging, zoom in/out, and pan the scene
 let controls = new OrbitControls(camera, renderer.domElement);
 
+controls.addEventListener('change', () => {
+    // Log camera position
+    console.log(`Camera Position: x=${camera.position.x.toFixed(2)}, y=${camera.position.y.toFixed(2)}, z=${camera.position.z.toFixed(2)}`);
+
+    // Log camera direction
+    const direction = new THREE.Vector3();
+    camera.getWorldDirection(direction);
+    console.log(`Camera Direction: x=${direction.x.toFixed(2)}, y=${direction.y.toFixed(2)}, z=${direction.z.toFixed(2)}`);
+});
+
+
 loader.load(
     '3D-Models/brain.glb', (file) => {
         console.log('\nModel loaded:', file);
@@ -126,7 +137,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 container3D.appendChild(renderer.domElement); //Add renderer to DOM
 
 //Camera
-camera.position.z = 120; //Set how far camera will be from 3D model
+camera.position.z = 150; //Set how far camera will be from 3D model
 
 //Customize OrbitControls 
 // controls.enableDamping = true; // Smooth camera movement
@@ -162,11 +173,12 @@ function animate() {
 
     // Automate movements
     if (model) {
-        model.rotation.z += 0.002; //Rotate horizontally
+        //model.rotation.z += 0.002; //Rotate horizontally
         //model.rotation.y += 0.002; //Rotate clockwise
         //model.rotation.x += 0.002; //Rotate vertically
     }
     
+    TWEEN.update();
     renderer.render(scene, camera);
 }
 
@@ -206,7 +218,7 @@ function updatePartPosition(partName, axis, positive, slider, value) {
     }
 }
 
-
+//Code for clicking the parts
 window.addEventListener('click', (event) => {
     // Update mouse coordinates (normalized device coordinates: -1 to +1)
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -234,9 +246,47 @@ window.addEventListener('click', (event) => {
             displayContainer.style.backgroundColor = ''; // Reset to original color
         }, 500);
 
-        console.log(`Clicked on: ${clickedObject.name || '(Unnamed)'} / ${objectParts_const[clickedObject.name].name}`);
+        //For testing purposes
+        //console.log(`Clicked on: ${clickedObject.name || '(Unnamed)'} / ${objectParts_const[clickedObject.name].name}`);
+
+        //Camera positions for each parts
+        const cameraPositions = {
+            Brain001: { x: 114.81, y: 3.15, z: -115.31 },  // Right Hemisphere
+            Brain001_0: { x: 114.81, y: 3.15, z: -115.31 },
+            Brain001_0_1: { x: 114.81, y: 3.15, z: -115.31 },
+            Brain002: { x: 106.62, y: -71.79, z: 86.68 },   // Cerebellum
+            Brain002_0: { x: 106.62, y: -71.79, z: 86.68 },
+            Brain003: { x: -50.67, y: 8.48, z: 150 },   // Left Hemisphere
+            Brain003_0: { x: -50.67, y: 8.48, z: 150 },
+            Brain003_0_1: { x: -50.67, y: 8.48, z: 150 }
+        };
+        const defaultCameraPosition = { x: 0, y: 0, z: 150 }; // Fallback offset        
         
+        // Get the target position (center of the clicked object)
+        const targetPosition = clickedObject.getWorldPosition(new THREE.Vector3());
+        
+        // Retrieve the camera position for the clicked part
+        const cameraPosition = cameraPositions[clickedObject.name] || defaultCameraPosition;
+        console.log(clickedObject.name)
+
+        // Smoothly move the camera to the specified position
+        new TWEEN.Tween(camera.position)
+            .to(cameraPosition, 1000) // Transition duration in milliseconds
+            .easing(TWEEN.Easing.Quadratic.InOut)
+            .onUpdate(() => {
+                camera.lookAt(targetPosition); // Ensure the camera always looks at the target
+            })
+            .start();
+
+        // Update controls target to the clicked object
+        controls.target.copy(targetPosition);
+        controls.update();
+
+        // Log for debugging
+        console.log(`Clicked part: ${clickedObject.name}`);
+        console.log(`Target Position: x=${targetPosition.x}, y=${targetPosition.y}, z=${targetPosition.z}`);
+        console.log(`Camera Position:`, cameraPosition);
     }
 });
 
-animate()
+animate();
