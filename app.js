@@ -77,11 +77,10 @@ const objectParts_const = {
 //This lines by itself allows clicking, dragging, zoom in/out, and pan the scene
 let controls = new OrbitControls(camera, renderer.domElement);
 
+//Logging for debugging
 controls.addEventListener('change', () => {
-    // Log camera position
     console.log(`Camera Position: x=${camera.position.x.toFixed(2)}, y=${camera.position.y.toFixed(2)}, z=${camera.position.z.toFixed(2)}`);
 
-    // Log camera direction
     const direction = new THREE.Vector3();
     camera.getWorldDirection(direction);
     console.log(`Camera Direction: x=${direction.x.toFixed(2)}, y=${direction.y.toFixed(2)}, z=${direction.z.toFixed(2)}`);
