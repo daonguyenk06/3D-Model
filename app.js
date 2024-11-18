@@ -16,7 +16,9 @@ const mouse = new THREE.Vector2();
 //HTML elements
 const container3D = document.getElementById("container3D");
 const displayContainer = document.getElementById('display-container');
-const animateBTN = document.getElementById('animateBtn');
+const partSlider = document.getElementById('part-slider');
+const sliderValue = document.getElementById('slider-value');
+
 
 let model;
 let objectParts = {}; //This list allows flexibility when changing file type
@@ -147,28 +149,63 @@ scene.add(ambientLight);
 const hemisphereLight = new THREE.HemisphereLight(0xFA6850, 0x333333, 1);
 scene.add(hemisphereLight);
 
-
-//Animation
-function animate() {
-    requestAnimationFrame(animate);
-    
-
-    if (model) {
-        // Automate movements (z: horizontally, y: clockwise, x: vertically)
-        model.rotation.z += 0.002;
-        //model.rotation.y += 0.002;
-        //model.rotation.x += 0.002;
-    }
-    
-    renderer.render(scene, camera);
-}
-
 //Resize window and camera
 window.addEventListener('resize', function() {
     camera.aspect = window.innerWidth / this.window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
+
+//Animation
+function animate() {
+    requestAnimationFrame(animate);
+
+    // Automate movements
+    if (model) {
+        model.rotation.z += 0.002; //Rotate horizontally
+        //model.rotation.y += 0.002; //Rotate clockwise
+        //model.rotation.x += 0.002; //Rotate vertically
+    }
+    
+    renderer.render(scene, camera);
+}
+
+//Move parts independently
+partSlider.addEventListener('input', () => {
+    updatePartPosition('Brain001', 'x', true, partSlider, sliderValue);
+    //updatePartPosition('Brain001_0', 'x', true, partSlider, sliderValue);
+    // updatePartPosition('Brain001_0_1', 'x', true, partSlider, sliderValue);
+    updatePartPosition('Brain002', 'y', true, partSlider, sliderValue);
+    // updatePartPosition('Brain002_0', 'y', true, partSlider, sliderValue);
+    updatePartPosition('Brain003', 'x', false, partSlider, sliderValue);
+    // updatePartPosition('Brain003_0', 'x', false, partSlider, sliderValue);
+    // updatePartPosition('Brain003_0_1', 'x', false, partSlider, sliderValue);
+
+});
+
+function updatePartPosition(partName, axis, positive, slider, value) {
+    const selectedPart = objectParts[partName]; // Get the selected part
+    if (selectedPart && selectedPart.object) {
+        const part = selectedPart.object;
+
+        // Update the chosen axis position based on slider value
+        const positionValue = parseFloat(slider.value);
+        if (positive) {
+            part.position[axis] = positionValue;
+        } else {
+            part.position[axis] = -positionValue;
+        }
+
+        // Update the slider value display
+        value.textContent = slider.value;
+
+        //For testing purposes
+        //console.log(`Updated ${part.name} position.${axis} to ${part.position[axis]}`);
+    } else {
+        console.error(`Part "${partName}" not found or invalid.`);
+    }
+}
+
 
 window.addEventListener('click', (event) => {
     // Update mouse coordinates (normalized device coordinates: -1 to +1)
@@ -185,7 +222,7 @@ window.addEventListener('click', (event) => {
         const clickedObject = intersects[0].object; // The first intersected object
 
         displayContainer.innerHTML = '';
-        const nameDisplay = document.createElement('h3');
+        const nameDisplay = document.createElement('h2');
         nameDisplay.textContent = objectParts_const[clickedObject.name].name || '(Unnamed)';
         displayContainer.appendChild(nameDisplay);
 
@@ -198,6 +235,7 @@ window.addEventListener('click', (event) => {
         }, 500);
 
         console.log(`Clicked on: ${clickedObject.name || '(Unnamed)'} / ${objectParts_const[clickedObject.name].name}`);
+        
     }
 });
 
