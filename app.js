@@ -71,9 +71,6 @@ const objectParts_const = {
     }
 };
 
-//TODO: Experiment with the 'controls' variable below
-
-
 //This lines by itself allows clicking, dragging, zoom in/out, and pan the scene
 let controls = new OrbitControls(camera, renderer.domElement);
 
